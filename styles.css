@@ -1309,7 +1309,7 @@ textarea {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 60px;
-    align-items: center;
+    align-items: flex-start;
     position: relative;
     z-index: 1;
 }
@@ -1402,6 +1402,13 @@ textarea {
 .upwork-cta {
     display: flex;
     justify-content: center;
+}
+
+.upwork-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
 }
 
 .upwork-card {

@@ -268,11 +268,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="section-title animate-on-scroll fade-in-up">
           <h2>Hire Me on Upwork</h2>
         </div>
-        <div class="upwork-content">
+       <div class="upwork-container">
+       <div class="upwork-content">
           <div class="upwork-info animate-on-scroll fade-in-left">
-            <div class="upwork-logo">
-              <i class="fab fa-upwork"></i>
-            </div>
             <h3>Ready to Work on Your Project</h3>
             <div class="upwork-stats">
               <div class="stat-item">
@@ -302,12 +300,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <div class="upwork-cta animate-on-scroll fade-in-right">
             <div class="upwork-card">
               <div class="upwork-card-header">
-                <i class="fab fa-upwork"></i>
                 <h4>Let's Work Together</h4>
               </div>
               <p>
                 Ready to start your next project? I'm here to help you achieve your goals 
-                with professional, high-quality solutions.
+                with professional solutions.
               </p>
               <a href="https://www.upwork.com/freelancers/~0157c5ba50d278cc2a" target="_blank" class="upwork-btn">
                 <i class="fab fa-upwork"></i>
@@ -329,6 +326,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               </div>
             </div>
           </div>
+       </div>
         </div>
       </div>
     </section>
