@@ -159,6 +159,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <ul id="navbar">
             <li><a href="#hero" class="nav-link">Home</a></li>
             <li><a href="#about" class="nav-link">About</a></li>
+            <li><a href="#upwork" class="nav-link">Upwork</a></li>
             <li><a href="#projects" class="nav-link">Projects</a></li>
             <li><a href="#contact" class="nav-link">Contact</a></li>
           </ul>
@@ -176,6 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <ul class="mobile-nav-links">
         <li><a href="#hero" class="mobile-nav-link">Home</a></li>
         <li><a href="#about" class="mobile-nav-link">About</a></li>
+        <li><a href="#upwork" class="mobile-nav-link">Upwork</a></li>
         <li><a href="#projects" class="mobile-nav-link">Projects</a></li>
         <li><a href="#contact" class="mobile-nav-link">Contact</a></li>
       </ul>
@@ -254,6 +256,76 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <span class="tech-badge badge-anim">Ethereum</span>
                 <span class="tech-badge badge-anim">Solidity</span>
                 <span class="tech-badge badge-anim">Web3.js</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="upwork">
+      <div class="container">
+        <div class="section-title animate-on-scroll fade-in-up">
+          <h2>Hire Me on Upwork</h2>
+        </div>
+        <div class="upwork-content">
+          <div class="upwork-info animate-on-scroll fade-in-left">
+            <div class="upwork-logo">
+              <i class="fab fa-upwork"></i>
+            </div>
+            <h3>Ready to Work on Your Project</h3>
+            <div class="upwork-stats">
+              <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Job Success</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number">2+</div>
+                <div class="stat-label">Industry Experience</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number">15+</div>
+                <div class="stat-label">Projects Completed</div>
+              </div>
+            </div>
+            <div class="upwork-services">
+              <h4>Services I Offer:</h4>
+              <ul>
+                <li><i class="fas fa-cloud"></i> Cloud Architecture & AWS Solutions</li>
+                <li><i class="fas fa-code"></i> Full-Stack Web Development</li>
+                <li><i class="fas fa-link"></i> Blockchain & Smart Contract Development</li>
+                <li><i class="fas fa-cogs"></i> DevOps & Kubernetes Implementation</li>
+                <li><i class="fas fa-mobile-alt"></i> API Development & Integration</li>
+              </ul>
+            </div>
+          </div>
+          <div class="upwork-cta animate-on-scroll fade-in-right">
+            <div class="upwork-card">
+              <div class="upwork-card-header">
+                <i class="fab fa-upwork"></i>
+                <h4>Let's Work Together</h4>
+              </div>
+              <p>
+                Ready to start your next project? I'm here to help you achieve your goals 
+                with professional, high-quality solutions.
+              </p>
+              <a href="https://www.upwork.com/freelancers/~0157c5ba50d278cc2a" target="_blank" class="upwork-btn">
+                <i class="fab fa-upwork"></i>
+                View My Upwork Profile
+              </a>
+              <div class="upwork-features">
+                <div class="feature">
+                  <i class="fas fa-clock"></i>
+                  <span>Fast Delivery</span>
+                </div>
+                <div class="feature">
+                  <i class="fas fa-comments"></i>
+                  <span>Clear Communication</span>
+                </div>
+                <div class="feature">
+                  <i class="fas fa-shield-alt"></i>
+                  <span>Secure Payments</span>
+                </div>
               </div>
             </div>
           </div>
@@ -474,10 +546,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         const closeMobileNav = document.getElementById('close-mobile-nav');
         const pageOverlay = document.querySelector('.page-overlay');
         const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-        
+        const header = document.getElementById('header');
         const successBanner = document.getElementById('success-banner');
         const closeSuccess = document.getElementById('close-success');
         
+        // Cache animated elements to avoid repeated DOM queries
+        const animatedElements = document.querySelectorAll('.animate-on-scroll');
+        let ticking = false;
+        
+        // Throttle scroll events for better performance
+        function updateAnimations() {
+          const screenPosition = window.innerHeight / 1.2;
+          
+          animatedElements.forEach(element => {
+            if (!element.classList.contains('animated')) {
+              const elementPosition = element.getBoundingClientRect().top;
+              
+              if (elementPosition < screenPosition) {
+                element.classList.add('animated');
+              }
+            }
+          });
+          
+          ticking = false;
+        }
+        
+        function requestTick() {
+          if (!ticking) {
+            requestAnimationFrame(updateAnimations);
+            ticking = true;
+          }
+        }
+        
+        // Optimized scroll handler
+        window.addEventListener('scroll', function() {
+          // Header scroll effect
+          if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+          } else {
+            header.classList.remove('scrolled');
+          }
+          
+          // Animation trigger
+          requestTick();
+        }, { passive: true });
+        
+        // Success banner handling
         if (closeSuccess) {
           closeSuccess.addEventListener('click', function() {
             successBanner.classList.add('hide-banner');
@@ -487,27 +601,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           }, 5000);
         }
         
-        const header = document.getElementById('header');
-        
-        window.addEventListener('scroll', function() {
-          if (window.scrollY > 50) {
-            header.classList.add('scrolled');
-          } else {
-            header.classList.remove('scrolled');
-          }
-          
-          const animatedElements = document.querySelectorAll('.animate-on-scroll');
-          
-          animatedElements.forEach(element => {
-            const elementPosition = element.getBoundingClientRect().top;
-            const screenPosition = window.innerHeight / 1.2;
-            
-            if (elementPosition < screenPosition) {
-              element.classList.add('animated');
-            }
-          });
-        });
-        
+        // Mobile navigation
         mobileNavToggle.addEventListener('click', function() {
           mobileNav.classList.add('active');
           pageOverlay.classList.add('active');
@@ -534,7 +628,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           });
         });
         
+        // Optimized code particles with reduced frequency
+        let particleCount = 0;
+        const maxParticles = 15;
+        
         function createCodeParticle() {
+          if (particleCount >= maxParticles) return;
+          
           const codeChars = ['<', '>', '/', '{', '}', ';', '()', '[]', '=>', '&&', '||', '0', '1'];
           const particles = document.querySelector('.code-particles');
           
@@ -554,20 +654,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             particle.style.animationDelay = `${delay}s`;
             
             particles.appendChild(particle);
+            particleCount++;
             
             setTimeout(() => {
-              particles.removeChild(particle);
+              if (particles.contains(particle)) {
+                particles.removeChild(particle);
+                particleCount--;
+              }
             }, (duration + delay) * 1000);
           }
         }
         
-        setInterval(createCodeParticle, 300);
+        // Reduced particle creation frequency
+        setInterval(createCodeParticle, 500);
         
+        // Initial animation check
         setTimeout(function() {
-          const initialElements = document.querySelectorAll('.animate-on-scroll');
-          initialElements.forEach(element => {
+          const screenPosition = window.innerHeight / 1;
+          
+          animatedElements.forEach(element => {
             const elementPosition = element.getBoundingClientRect().top;
-            const screenPosition = window.innerHeight / 1;
             
             if (elementPosition < screenPosition) {
               element.classList.add('animated');
