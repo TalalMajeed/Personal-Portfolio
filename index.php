@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mail->isSMTP();
         $mail->Host = 'smtp.hostinger.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'outreach@codexon.pk';
+        $mail->Username = 'outreach@developertest.cloud';
         $mail->Password = 'Ethereum360#';
         $mail->SMTPSecure = 'ssl';
         $mail->Port = 465;
