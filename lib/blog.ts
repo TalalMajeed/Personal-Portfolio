@@ -1,4 +1,5 @@
-import type { Collection, ObjectId } from "mongodb";
+import type { Collection } from "mongodb";
+import { ObjectId } from "mongodb";
 import { getDb } from "./mongodb";
 
 export const BLOG_COLLECTION = "blog_posts";
@@ -82,5 +83,89 @@ export async function getBlogPostBySlug(
 ): Promise<BlogPostDocument | null> {
   const collection = await getBlogCollection();
   return collection.findOne({ slug, published: true });
+}
+
+export async function getBlogPostById(
+  id: string,
+): Promise<BlogPostDocument | null> {
+  const collection = await getBlogCollection();
+  return collection.findOne({ _id: new ObjectId(id) });
+}
+
+export async function updateBlogPost(
+  id: string,
+  updates: {
+    title?: string;
+    slug?: string;
+    summary?: string;
+    content?: string;
+    tags?: string[];
+    seoTitle?: string;
+    seoDescription?: string;
+    published?: boolean;
+  },
+): Promise<BlogPostDocument | null> {
+  const collection = await getBlogCollection();
+
+  const updateDoc: Partial<BlogPostDocument> & { updatedAt: Date } = {
+    updatedAt: new Date(),
+  };
+
+  if (typeof updates.title === "string") {
+    updateDoc.title = updates.title;
+  }
+
+  if (typeof updates.summary === "string") {
+    updateDoc.summary = updates.summary;
+  }
+
+  if (typeof updates.content === "string") {
+    updateDoc.content = updates.content;
+  }
+
+  if (Array.isArray(updates.tags)) {
+    updateDoc.tags = updates.tags;
+  }
+
+  if (typeof updates.seoTitle === "string") {
+    updateDoc.seoTitle = updates.seoTitle;
+  }
+
+  if (typeof updates.seoDescription === "string") {
+    updateDoc.seoDescription = updates.seoDescription;
+  }
+
+  if (typeof updates.published === "boolean") {
+    updateDoc.published = updates.published;
+  }
+
+  if (typeof updates.slug === "string") {
+    const normalizedSlug = updates.slug;
+
+    const existingWithSlug = await collection.findOne({
+      slug: normalizedSlug,
+      _id: { $ne: new ObjectId(id) },
+    } as never);
+
+    if (existingWithSlug) {
+      throw new Error("A blog post with this slug already exists.");
+    }
+
+    updateDoc.slug = normalizedSlug;
+  }
+
+  const result = await collection.findOneAndUpdate(
+    { _id: new ObjectId(id) },
+    { $set: updateDoc },
+    { returnDocument: "after" },
+  );
+
+  return result.value;
+}
+
+export async function deleteBlogPost(id: string): Promise<boolean> {
+  const collection = await getBlogCollection();
+  const result = await collection.deleteOne({ _id: new ObjectId(id) });
+  return result.deletedCount === 1;
 }
 

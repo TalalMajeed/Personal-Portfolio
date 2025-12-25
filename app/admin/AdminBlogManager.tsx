@@ -36,6 +36,8 @@ type FormState = {
 export function AdminBlogManager({ initialPosts }: Props) {
   const router = useRouter();
   const [posts, setPosts] = useState<BlogPostSummary[]>(initialPosts);
+   const [editingPostId, setEditingPostId] = useState<string | null>(null);
+   const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>({
     title: "",
     slug: "",
@@ -76,6 +78,72 @@ export function AdminBlogManager({ initialPosts }: Props) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  function resetForm() {
+    setForm({
+      title: "",
+      slug: "",
+      summary: "",
+      content: "",
+      tags: "",
+      seoTitle: "",
+      seoDescription: "",
+      published: true,
+      loading: false,
+    });
+    setEditingPostId(null);
+  }
+
+  async function loadPostForEditing(id: string) {
+    try {
+      setForm((prev) => ({ ...prev, loading: true }));
+
+      const response = await fetch(`/api/blog/${id}`, {
+        credentials: "include",
+      });
+
+      const data = (await response.json().catch(() => ({}))) as {
+        success?: boolean;
+        message?: string;
+        post?: {
+          id: string;
+          title: string;
+          slug: string;
+          summary: string;
+          content: string;
+          tags?: string[];
+          seoTitle?: string;
+          seoDescription?: string;
+          published: boolean;
+        };
+      };
+
+      if (!response.ok || !data.success || !data.post) {
+        toast.error(data.message || "Failed to load post for editing.");
+        setForm((prev) => ({ ...prev, loading: false }));
+        return;
+      }
+
+      const post = data.post;
+
+      setForm({
+        title: post.title,
+        slug: post.slug,
+        summary: post.summary,
+        content: post.content,
+        tags: (post.tags ?? []).join(", "),
+        seoTitle: post.seoTitle ?? "",
+        seoDescription: post.seoDescription ?? "",
+        published: post.published,
+        loading: false,
+      });
+      setEditingPostId(post.id);
+    } catch (error) {
+      console.error("Error loading post for editing:", error);
+      toast.error("Something went wrong. Please try again.");
+      setForm((prev) => ({ ...prev, loading: false }));
+    }
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!form.title.trim() || !form.summary.trim() || !form.content.trim()) {
@@ -86,23 +154,28 @@ export function AdminBlogManager({ initialPosts }: Props) {
     setForm((prev) => ({ ...prev, loading: true }));
 
     try {
-      const response = await fetch("/api/blog", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const isEditing = Boolean(editingPostId);
+
+      const response = await fetch(
+        isEditing ? `/api/blog/${editingPostId}` : "/api/blog",
+        {
+          method: isEditing ? "PATCH" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            title: form.title,
+            slug: form.slug,
+            summary: form.summary,
+            content: form.content,
+            tags: form.tags,
+            seoTitle: form.seoTitle,
+            seoDescription: form.seoDescription,
+            published: form.published,
+          }),
         },
-        credentials: "include",
-        body: JSON.stringify({
-          title: form.title,
-          slug: form.slug,
-          summary: form.summary,
-          content: form.content,
-          tags: form.tags,
-          seoTitle: form.seoTitle,
-          seoDescription: form.seoDescription,
-          published: form.published,
-        }),
-      });
+      );
 
       const data = (await response.json().catch(() => ({}))) as {
         success?: boolean;
@@ -111,43 +184,101 @@ export function AdminBlogManager({ initialPosts }: Props) {
       };
 
       if (!response.ok || !data.success || !data.post) {
-        toast.error(data.message || "Failed to create blog post.");
+        toast.error(
+          data.message ||
+            (editingPostId
+              ? "Failed to update blog post."
+              : "Failed to create blog post."),
+        );
         setForm((prev) => ({ ...prev, loading: false }));
         return;
       }
 
-      setPosts((prev) => [data.post!, ...prev]);
+      setPosts((prev) =>
+        editingPostId
+          ? prev.map((post) =>
+              post.id === editingPostId ? data.post! : post,
+            )
+          : [data.post!, ...prev],
+      );
 
-      toast.success("Blog post created.");
+      toast.success(
+        editingPostId ? "Blog post updated." : "Blog post created.",
+      );
 
-      setForm({
-        title: "",
-        slug: "",
-        summary: "",
-        content: "",
-        tags: "",
-        seoTitle: "",
-        seoDescription: "",
-        published: true,
-        loading: false,
-      });
+      resetForm();
 
       router.refresh();
     } catch (error) {
-      console.error("Error creating blog post:", error);
+      console.error("Error saving blog post:", error);
       toast.error("Something went wrong. Please try again.");
       setForm((prev) => ({ ...prev, loading: false }));
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("Are you sure you want to delete this post?")) {
+      return;
+    }
+
+    try {
+      setDeletingPostId(id);
+
+      const response = await fetch(`/api/blog/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      const data = (await response.json().catch(() => ({}))) as {
+        success?: boolean;
+        message?: string;
+      };
+
+      if (!response.ok || !data.success) {
+        toast.error(data.message || "Failed to delete blog post.");
+        setDeletingPostId(null);
+        return;
+      }
+
+      setPosts((prev) => prev.filter((post) => post.id !== id));
+
+      if (editingPostId === id) {
+        resetForm();
+      }
+
+      toast.success("Blog post deleted.");
+      setDeletingPostId(null);
+    } catch (error) {
+      console.error("Error deleting blog post:", error);
+      toast.error("Something went wrong. Please try again.");
+      setDeletingPostId(null);
     }
   }
 
   return (
     <div className="space-y-8">
       <section className="space-y-2">
-        <h2 className="text-xl font-semibold tracking-tight">
-          Create New Blog Post
-        </h2>
+        <div className="flex items-baseline justify-between gap-2">
+          <h2 className="text-xl font-semibold tracking-tight">
+            {editingPostId ? "Edit Blog Post" : "Create New Blog Post"}
+          </h2>
+          {editingPostId ? (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="text-xs font-medium text-muted-foreground underline-offset-2 hover:underline"
+            >
+              Cancel editing
+            </button>
+          ) : null}
+        </div>
         <p className="text-sm text-muted-foreground">
-          Add content, summary, and SEO details for a new article.
+          {editingPostId
+            ? "Update the content, SEO details, or publish status for this article."
+            : "Add content, summary, and SEO details for a new article."}
         </p>
 
         <form
@@ -208,7 +339,7 @@ export function AdminBlogManager({ initialPosts }: Props) {
               onChange={(event) =>
                 handleChange("content", event.target.value)
               }
-              placeholder="Write your blog content here. You can start simple text now and enhance the renderer later."
+              placeholder="Write your blog content here. HTML is supported (e.g. <p>, <h2>, <a>, <code>)."
               rows={10}
               required
             />
@@ -281,16 +412,18 @@ export function AdminBlogManager({ initialPosts }: Props) {
               disabled={form.loading}
               className="ml-auto"
             >
-              {form.loading ? "Saving..." : "Create Post"}
+              {form.loading
+                ? "Saving..."
+                : editingPostId
+                  ? "Save Changes"
+                  : "Create Post"}
             </Button>
           </div>
         </form>
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-xl font-semibold tracking-tight">
-          Existing Posts
-        </h2>
+        <h2 className="text-xl font-semibold tracking-tight">Existing Posts</h2>
         <p className="text-sm text-muted-foreground">
           Recent articles you&apos;ve published or drafted.
         </p>
@@ -300,26 +433,62 @@ export function AdminBlogManager({ initialPosts }: Props) {
             No posts yet. Create your first article using the form above.
           </p>
         ) : (
-          <div className="mt-4 grid gap-3">
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
             {posts.map((post) => (
               <Card
                 key={post.id}
-                className="flex items-start justify-between gap-4 border-border bg-card/80 p-4"
+                className="flex flex-col justify-between border-border bg-card/80 p-4"
               >
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-sm font-semibold">{post.title}</h3>
                     <span className="text-xs text-muted-foreground">
                       /blog/{post.slug}
                     </span>
                   </div>
-                  <p className="line-clamp-2 text-sm text-muted-foreground">
+                  <p className="line-clamp-3 text-sm text-muted-foreground">
                     {post.summary}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {post.published ? "Published" : "Draft"} •{" "}
                     {new Date(post.createdAt).toLocaleDateString()}
                   </p>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => loadPostForEditing(post.id)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      asChild
+                    >
+                      <a
+                        href={`/blog/${post.slug}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        View
+                      </a>
+                    </Button>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    disabled={deletingPostId === post.id}
+                    onClick={() => handleDelete(post.id)}
+                  >
+                    {deletingPostId === post.id ? "Deleting..." : "Delete"}
+                  </Button>
                 </div>
               </Card>
             ))}
@@ -329,4 +498,3 @@ export function AdminBlogManager({ initialPosts }: Props) {
     </div>
   );
 }
-

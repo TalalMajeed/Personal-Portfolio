@@ -122,9 +122,10 @@ export default async function BlogPostPage({ params }: PageProps) {
             ) : null}
           </header>
 
-          <section className="mt-8 whitespace-pre-wrap text-gray-800">
-            {post.content}
-          </section>
+          <section
+            className="mt-8 text-gray-800"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
         </article>
       </main>
       <Footer />
