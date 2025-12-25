@@ -7,9 +7,9 @@ export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [
-    { href: "#home", label: "Home" },
+    { href: "/", label: "Home" },
     { href: "#projects", label: "Projects" },
-    { href: "#blog", label: "Blog" },
+    { href: "/blog", label: "Blog" },
     { href: "#contact", label: "Contact" },
   ];
 
@@ -23,13 +23,13 @@ export default function Navigation() {
         {/* Desktop Navigation */}
         <div className="hidden md:flex gap-8">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               className="text-gray-600 hover:text-gray-900 transition-colors font-medium"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -58,16 +58,27 @@ export default function Navigation() {
       {isOpen && (
         <div className="md:hidden bg-gray-50 border-t border-gray-200">
           <div className="px-6 py-4 space-y-3">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="block text-gray-600 hover:text-gray-900 transition-colors font-medium"
-                onClick={() => setIsOpen(false)}
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) =>
+              link.href.startsWith("#") ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="block text-gray-600 hover:text-gray-900 transition-colors font-medium"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="block text-gray-600 hover:text-gray-900 transition-colors font-medium"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
           </div>
         </div>
       )}

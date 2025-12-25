@@ -2,7 +2,7 @@ export default function HeroSection() {
   return (
     <section
       id="home"
-      className="min-h-screen bg-white flex items-center justify-center px-6 pt-20"
+      className="min-h-screen bg-white flex items-center justify-center px-6"
     >
       <div className="text-center max-w-2xl">
         <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">

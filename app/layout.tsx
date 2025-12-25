@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Montserrat } from "next/font/google";
+import { siteConfig } from "@/lib/seo";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -13,9 +14,37 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Talal Majeed | Senior Software Engineer",
-  description:
-    "Portfolio website of Talal Majeed, a Senior Software Engineer specializing in full-stack web development, React, and Node.js.",
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: "Talal Majeed | Senior Software Engineer",
+    template: "%s | Talal Majeed",
+  },
+  description: siteConfig.description,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    url: "/",
+    title: "Talal Majeed | Senior Software Engineer",
+    description: siteConfig.description,
+  },
+  twitter: {
+    card: "summary",
+    title: "Talal Majeed | Senior Software Engineer",
+    description: siteConfig.description,
+  },
+};
+
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Talal Majeed",
+  url: siteConfig.url,
+  sameAs: [
+    "https://www.linkedin.com/in/talalmajeed/",
+    "https://www.upwork.com/freelancers/muhammadtalalm",
+  ],
 };
 
 export default function RootLayout({
@@ -28,6 +57,13 @@ export default function RootLayout({
       <body
         className={`${montserrat.variable} ${geistMono.variable} antialiased`}
       >
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(personJsonLd),
+          }}
+        />
         {children}
       </body>
     </html>
