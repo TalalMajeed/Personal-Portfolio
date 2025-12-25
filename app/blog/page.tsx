@@ -37,15 +37,11 @@ export default async function BlogPage() {
   return (
     <div className="bg-white">
       <Navigation />
-      <main className="mx-auto max-w-4xl px-6 py-16">
+      <main className="min-h-[93svh] mx-auto max-w-4xl px-6 py-16">
         <header className="mb-10 space-y-2">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
             Blog
           </h1>
-          <p className="text-gray-600">
-            Deep dives, case studies, and notes from my work as a Senior
-            Software Engineer.
-          </p>
         </header>
 
         <script
@@ -66,10 +62,7 @@ export default async function BlogPage() {
                 key={post.slug}
                 className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md"
               >
-                <a
-                  href={`/blog/${post.slug}`}
-                  className="block space-y-2"
-                >
+                <a href={`/blog/${post.slug}`} className="block space-y-2">
                   <h2 className="text-xl font-semibold text-gray-900">
                     {post.title}
                   </h2>
@@ -91,4 +84,3 @@ export default async function BlogPage() {
     </div>
   );
 }
-
