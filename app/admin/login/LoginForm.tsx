@@ -51,7 +51,7 @@ export function LoginForm() {
         return;
       }
 
-      router.push("/panel");
+      router.push("/admin");
     } catch (error) {
       setState((prev) => ({
         ...prev,
@@ -125,4 +125,3 @@ export function LoginForm() {
     </form>
   );
 }
-

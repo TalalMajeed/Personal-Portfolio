@@ -1,4 +1,14 @@
-export default function PanelHomePage() {
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
+export default async function PanelHomePage() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("admin_session");
+
+  if (!session) {
+    redirect("/admin/login");
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-xl space-y-4 rounded-lg border border-border bg-card p-8 shadow-sm">

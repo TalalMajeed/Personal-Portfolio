@@ -33,12 +33,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // In a real application you would set a secure session cookie here.
-
-    return NextResponse.json(
+    const response = NextResponse.json(
       { success: true, message: "Login successful." },
       { status: 200 },
     );
+
+    response.cookies.set("admin_session", "true", {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 8,
+    });
+
+    return response;
   } catch (error) {
     console.error("Login error:", error);
 
@@ -48,4 +56,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
