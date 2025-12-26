@@ -9,10 +9,6 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type RouteContext = {
-  params: { id: string };
-};
-
 async function ensureAdminSession() {
   const cookieStore = await cookies();
   const session = cookieStore.get("admin_session");
@@ -36,7 +32,7 @@ async function triggerFrontendRebuild() {
 
 export async function GET(
   _request: Request,
-  context: RouteContext,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     if (!(await ensureAdminSession())) {
@@ -46,7 +42,7 @@ export async function GET(
       );
     }
 
-    const { id } = context.params;
+    const { id } = await params;
     const post = await getBlogPostById(id);
 
     if (!post) {
@@ -89,7 +85,7 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  context: RouteContext,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     if (!(await ensureAdminSession())) {
@@ -108,7 +104,7 @@ export async function PATCH(
       );
     }
 
-    const { id } = context.params;
+    const { id } = await params;
 
     const updated = await updateBlogPost(id, {
       title:
@@ -195,7 +191,7 @@ export async function PATCH(
 
 export async function DELETE(
   _request: Request,
-  context: RouteContext,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     if (!(await ensureAdminSession())) {
@@ -205,7 +201,7 @@ export async function DELETE(
       );
     }
 
-    const { id } = context.params;
+    const { id } = await params;
 
     const deleted = await deleteBlogPost(id);
 

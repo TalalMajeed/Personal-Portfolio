@@ -23,9 +23,7 @@ export function LoginForm() {
       const data = await response.json().catch(() => null);
 
       if (!response.ok || !data?.success) {
-        setError(
-          data?.message ?? "Login failed. Please try again.",
-        );
+        setError(data?.message ?? "Login failed. Please try again.");
         setLoading(false);
         return;
       }
@@ -40,9 +38,7 @@ export function LoginForm() {
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
-      {error ? (
-        <p className="text-sm text-red-600">{error}</p>
-      ) : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
       <div className="space-y-1">
         <label
@@ -75,9 +71,7 @@ export function LoginForm() {
           autoComplete="current-password"
           className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
           value={password}
-          onChange={(event) =>
-            setPassword(event.target.value)
-          }
+          onChange={(event) => setPassword(event.target.value)}
           required
         />
       </div>
@@ -89,16 +83,6 @@ export function LoginForm() {
       >
         {loading ? "Signing in..." : "Sign in"}
       </button>
-
-      <p className="mt-2 text-xs text-gray-500">
-        Default admin account is{" "}
-        <span className="font-mono">
-          admin@talalmajeed.com / helloworld
-        </span>
-        . Change this in <code>lib/auth.ts</code> and in the
-        database after first login.
-      </p>
     </form>
   );
 }
-

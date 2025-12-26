@@ -50,15 +50,15 @@ jobs:
         run: gcloud auth configure-docker us-central1-docker.pkg.dev --project=${{ secrets.GCP_PROJECT_ID }}
 
       - name: Build Docker image
-        run: docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/primary-repository/talal-portfolio .
+        run: docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/primary-repository/talal-portfolio-admin .
 
       - name: Push Docker image
-        run: docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/primary-repository/talal-portfolio
+        run: docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/primary-repository/talal-portfolio-admin
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy talal-portfolio \
-            --image us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/primary-repository/talal-portfolio \
+          gcloud run deploy talal-portfolio-admin \
+            --image us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/primary-repository/talal-portfolio-admin \
             --region us-central1 \
             --platform managed \
             --allow-unauthenticated \

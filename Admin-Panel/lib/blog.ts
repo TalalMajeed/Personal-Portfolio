@@ -5,7 +5,7 @@ import { getDb } from "./mongodb";
 export const BLOG_COLLECTION = "blog_posts";
 
 export type BlogPostDocument = {
-  _id: ObjectId;
+  _id: ObjectId | string;
   title: string;
   slug: string;
   summary: string;
@@ -97,7 +97,11 @@ export async function getBlogPostById(
   id: string,
 ): Promise<BlogPostDocument | null> {
   const collection = await getBlogCollection();
-  return collection.findOne({ _id: new ObjectId(id) });
+  const filter = ObjectId.isValid(id)
+    ? { _id: new ObjectId(id) }
+    : { _id: id };
+
+  return collection.findOne(filter);
 }
 
 export async function updateBlogPost(
@@ -154,8 +158,10 @@ export async function updateBlogPost(
 
     const existingWithSlug = await collection.findOne({
       slug: normalizedSlug,
-      _id: { $ne: new ObjectId(id) },
-    } as never);
+      _id: ObjectId.isValid(id)
+        ? { $ne: new ObjectId(id) }
+        : { $ne: id },
+    });
 
     if (existingWithSlug) {
       throw new Error("A blog post with this slug already exists.");
@@ -165,7 +171,9 @@ export async function updateBlogPost(
   }
 
   const result = await collection.findOneAndUpdate(
-    { _id: new ObjectId(id) },
+    ObjectId.isValid(id)
+      ? { _id: new ObjectId(id) }
+      : { _id: id },
     { $set: updateDoc },
     { returnDocument: "after" },
   );
@@ -177,8 +185,10 @@ export async function deleteBlogPost(
   id: string,
 ): Promise<boolean> {
   const collection = await getBlogCollection();
-  const result = await collection.deleteOne({
-    _id: new ObjectId(id),
-  });
+  const filter = ObjectId.isValid(id)
+    ? { _id: new ObjectId(id) }
+    : { _id: id };
+
+  const result = await collection.deleteOne(filter);
   return result.deletedCount === 1;
 }
