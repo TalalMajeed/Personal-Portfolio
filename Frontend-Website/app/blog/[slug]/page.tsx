@@ -9,13 +9,13 @@ type Params = {
 };
 
 type PageProps = {
-  params: Params;
+  params: Promise<Params>;
 };
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
   const post = await getBlogPostBySlug(slug);
   console.log("Generating metadata for slug:", slug, "Post found:", !!post);
 
@@ -51,7 +51,7 @@ export async function generateMetadata({
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
-  const { slug } = params;
+  const { slug } = await params;
   const post = await getBlogPostBySlug(slug);
 
   if (!post) {
