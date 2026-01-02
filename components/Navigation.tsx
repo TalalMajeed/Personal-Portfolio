@@ -24,7 +24,7 @@ export default function Navigation() {
         <div className="hidden md:flex gap-8">
           {navLinks.map((link) => (
             <Link
-              key={link.href}
+              key={link.label}
               href={link.href}
               className="text-gray-600 hover:text-gray-900 transition-colors font-medium"
             >
@@ -61,7 +61,7 @@ export default function Navigation() {
             {navLinks.map((link) =>
               link.href.startsWith("#") ? (
                 <a
-                  key={link.href}
+                  key={link.label}
                   href={link.href}
                   className="block text-gray-600 hover:text-gray-900 transition-colors font-medium"
                   onClick={() => setIsOpen(false)}
@@ -70,7 +70,7 @@ export default function Navigation() {
                 </a>
               ) : (
                 <Link
-                  key={link.href}
+                  key={link.label}
                   href={link.href}
                   className="block text-gray-600 hover:text-gray-900 transition-colors font-medium"
                   onClick={() => setIsOpen(false)}

@@ -34,6 +34,9 @@ export const metadata: Metadata = {
     title: "Talal Majeed | Senior Software Engineer",
     description: siteConfig.description,
   },
+  icons: {
+    icon: "./favicon-v2.ico",
+  },
 };
 
 const personJsonLd = {
